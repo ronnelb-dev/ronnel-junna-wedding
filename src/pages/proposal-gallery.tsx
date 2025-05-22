@@ -8,6 +8,8 @@ import Footer from "@/components/Footer";
 import Preloader from "@/components/preloader";
 import { Playfair_Display } from "next/font/google";
 import Image from "next/image";
+import fs from "fs";
+import path from "path";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -21,9 +23,6 @@ interface GalleryImage {
 const batchSize = 24;
 
 export async function getStaticProps() {
-  const fs = require("fs");
-  const path = require("path");
-
   const directoryPath = path.join(process.cwd(), "public/proposal");
   const files = fs.readdirSync(directoryPath);
 
