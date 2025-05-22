@@ -48,7 +48,7 @@ const Hero: FC = () => {
 
               {/* Centered content */}
               <div className="relative z-10 flex flex-col h-full items-center justify-center text-white text-center px-4">
-                <Divider position="top" />
+                <Divider position="top" className="md:w-[100%] w-[70%] max-w-4xl mx-auto" />
 
                 <div className="flex flex-wrap items-end justify-center gap-x-4 gap-y-2 mt-5 mb-5">
                   <span className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl mb-2 sm:mb-4">
@@ -61,8 +61,7 @@ const Hero: FC = () => {
                     Junna
                   </span>
                 </div>
-                <Divider position="bottom" />
-
+                <Divider position="bottom" className="md:w-[100%] w-[70%] max-w-4xl mx-auto" />
                 <p className="text-base sm:text-lg md:text-xl lg:text-2xl mt-4 sm:mt-6 mb-4 sm:mb-6">
                   Are getting married in
                 </p>

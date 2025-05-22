@@ -17,8 +17,8 @@ const SaveTheDateSection: FC = () => {
         <div className="absolute inset-0 bg-[#C08081]/50" />
 
         {/* Centered content */}
-        <div className="absolute inset-0 z-20 flex flex-col items-center px-4 py-24 text-white">
-          <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
+        <div className="absolute inset-0 z-20 flex flex-col justify-center items-center px-4 text-white">
+          <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold sm:mb-12 mb-6 text-center">
             We&apos;re getting married
           </h3>
 
@@ -47,7 +47,7 @@ const SaveTheDateSection: FC = () => {
                 Request the honor of your presence on their wedding day
               </p>
 
-              <Divider position="top" width={160} height={80} />
+              <Divider position="top" className="w-[50%] max-w-4xl mx-auto" />
 
               <div className=" py-3 text-center text-white">
                 <p className="text-xl sm:text-2xl md:text-3xl font-bold">
@@ -56,7 +56,7 @@ const SaveTheDateSection: FC = () => {
                 <p className="text-base md:text-lg">at 04:00 PM</p>
               </div>
 
-              <Divider position="bottom" width={160} height={80} />
+              <Divider position="bottom" className="w-[50%] max-w-4xl mx-auto" />
 
               <div className="text-base md:text-lg leading-snug text-center text-white">
                 <p>at Sky Garden Cafe</p>
