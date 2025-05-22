@@ -27,7 +27,7 @@ const ProposalSection = () => {
         <div className="flex-1 relative">
           <div className="w-[280px] sm:w-[320px] md:w-[360px] mx-auto md:mx-0 transform md:translate-x-8 lg:translate-x-16">
             <Image
-              src="/images/RonnelJuna-98.jpg"
+              src="/images/RonnelJuna-98.JPG"
               alt="Proposal"
               width={360}
               height={540}

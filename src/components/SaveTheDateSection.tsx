@@ -10,7 +10,7 @@ const SaveTheDateSection: FC = () => {
         {/* Background image layer */}
         <div
           className="absolute inset-0 bg-center bg-cover bg-no-repeat"
-          style={{ backgroundImage: `url(/images/DSC04481.jpg)` }}
+          style={{ backgroundImage: `url(/images/DSC04481.JPG)` }}
         />
 
         {/* Overlay (optional dark layer for text readability) */}
