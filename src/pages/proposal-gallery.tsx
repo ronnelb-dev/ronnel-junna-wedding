@@ -100,7 +100,7 @@ export default function ProposalGalleryPage() {
               className="relative col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2 cursor-pointer overflow-hidden rounded-lg shadow-md group aspect-video"
             >
               <Image
-                src="/images/slider8.jpg" // Replace with actual thumbnail path
+                src="/public/images/slider8.jpg" // Replace with actual thumbnail path
                 alt="Play Proposal Video"
                 fill
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
