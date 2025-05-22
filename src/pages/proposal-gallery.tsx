@@ -18,14 +18,14 @@ interface GalleryImage {
   src: string;
 }
 
-const imageCount = 139;
+const imageCount = 159;
 const batchSize = 24;
 
 const images: GalleryImage[] = Array.from({ length: imageCount }, (_, i) => ({
-  src: `/prenup/DSC${i + 1}.jpg`,
+  src: `/proposal/RonnelJuna-${i + 1}.JPG`,
 }));
 
-export default function PrenupGalleryPage() {
+export default function ProposalGalleryPage() {
   const [visibleImages, setVisibleImages] = useState<GalleryImage[]>(
     images.slice(0, batchSize)
   );
@@ -79,8 +79,8 @@ export default function PrenupGalleryPage() {
   return (
     <>
       <Head>
-        <title>Ronnel & Junna - Prenup Gallery</title>
-        <meta name="description" content="Ronnel and Junna Prenup" />
+        <title>Ronnel & Junna - Proposal Gallery</title>
+        <meta name="description" content="March 14, 2023 Proposal Day" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -90,10 +90,32 @@ export default function PrenupGalleryPage() {
 
         <div className="bg-gray-100 min-h-screen py-16 px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-800 text-center">
-            Prenup - Proposal Gallery
+            Proposal Gallery
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            {/* Embedded YouTube Video */}
+            <div
+              onClick={() => setShowVideoModal(true)}
+              className="relative col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2 cursor-pointer overflow-hidden rounded-lg shadow-md group aspect-video"
+            >
+              <Image
+                src="/proposal/RonnelJuna-141.JPG" // Replace with actual thumbnail path
+                alt="Play Proposal Video"
+                fill
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <svg
+                  className="w-16 h-16 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 15 15"
+                >
+                  <path d="M6.5 5.5v9l7-4.5-7-4.5z" />
+                </svg>
+              </div>
+            </div>
+
             {visibleImages.map((img, idx) => (
               <div
                 key={idx}
@@ -103,7 +125,7 @@ export default function PrenupGalleryPage() {
                 <div className="relative w-full h-60">
                   <Image
                     src={img.src}
-                    alt="Prenup Photo"
+                    alt="Proposal Photo"
                     fill
                     className="object-cover rounded-lg"
                     sizes="(max-width: 768px) 100vw, 25vw"
