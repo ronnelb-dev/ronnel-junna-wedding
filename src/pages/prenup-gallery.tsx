@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { GetStaticProps } from "next";
 import "@/styles/globals.css";
 import Head from "next/head";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
@@ -18,16 +19,15 @@ interface GalleryImage {
   src: string;
 }
 
-const imageCount = 139;
+interface Props {
+  allImages: GalleryImage[];
+}
+
 const batchSize = 24;
 
-const images: GalleryImage[] = Array.from({ length: imageCount }, (_, i) => ({
-  src: `/prenup/DSC${i + 1}.jpg`,
-}));
-
-export default function PrenupGalleryPage() {
+export default function PrenupGalleryPage({ allImages }: Props) {
   const [visibleImages, setVisibleImages] = useState<GalleryImage[]>(
-    images.slice(0, batchSize)
+    allImages.slice(0, batchSize)
   );
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -37,17 +37,19 @@ export default function PrenupGalleryPage() {
   const showImage = (index: number) => setCurrentIndex(index);
   const closeModal = () => setCurrentIndex(null);
   const showNext = () =>
-    setCurrentIndex((prev) => (prev !== null ? (prev + 1) % images.length : 0));
+    setCurrentIndex((prev) =>
+      prev !== null ? (prev + 1) % allImages.length : 0
+    );
   const showPrev = () =>
     setCurrentIndex((prev) =>
-      prev !== null ? (prev - 1 + images.length) % images.length : 0
+      prev !== null ? (prev - 1 + allImages.length) % allImages.length : 0
     );
 
   const loadMoreImages = useCallback(() => {
     setIsLoading(true);
 
     setTimeout(() => {
-      const nextImages = images.slice(
+      const nextImages = allImages.slice(
         visibleImages.length,
         visibleImages.length + batchSize
       );
@@ -60,7 +62,7 @@ export default function PrenupGalleryPage() {
 
       setIsLoading(false);
     }, 1000);
-  }, [visibleImages.length]);
+  }, [visibleImages.length, allImages]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -126,7 +128,6 @@ export default function PrenupGalleryPage() {
             </p>
           )}
 
-          {/* Lightbox Modal */}
           {currentIndex !== null && (
             <div className="fixed inset-0 bg-black bg-black/80 flex items-center justify-center z-50 px-4">
               <button
@@ -146,7 +147,7 @@ export default function PrenupGalleryPage() {
               <div className="flex flex-col items-center">
                 <div className="relative w-[90vw] h-[80vh]">
                   <Image
-                    src={images[currentIndex].src}
+                    src={allImages[currentIndex].src}
                     alt="Prenup Photo"
                     fill
                     className="object-contain rounded-md shadow-lg"
@@ -166,7 +167,6 @@ export default function PrenupGalleryPage() {
 
           {showVideoModal && (
             <div className="fixed inset-0 z-50 bg-black bg-black/80 flex items-center justify-center px-4">
-              {/* Close Button */}
               <button
                 className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
                 onClick={() => setShowVideoModal(false)}
@@ -174,7 +174,6 @@ export default function PrenupGalleryPage() {
                 <FaTimes />
               </button>
 
-              {/* Responsive Video Container */}
               <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
                 <iframe
                   className="w-full h-full"
@@ -193,3 +192,17 @@ export default function PrenupGalleryPage() {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const fs = require("fs");
+  const path = require("path");
+  const dir = path.join(process.cwd(), "public", "prenup");
+  const files = fs.readdirSync(dir);
+  const allImages = files
+    .filter((file: string) => /\.(jpe?g|png|webp)$/i.test(file))
+    .map((file: string) => ({ src: `/prenup/${file}` }));
+
+  return {
+    props: { allImages },
+  };
+};

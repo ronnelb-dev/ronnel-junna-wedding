@@ -18,14 +18,27 @@ interface GalleryImage {
   src: string;
 }
 
-const imageCount = 159;
 const batchSize = 24;
 
-const images: GalleryImage[] = Array.from({ length: imageCount }, (_, i) => ({
-  src: `/proposal/RonnelJuna-${i + 1}.JPG`,
-}));
+export async function getStaticProps() {
+  const fs = require("fs");
+  const path = require("path");
 
-export default function ProposalGalleryPage() {
+  const directoryPath = path.join(process.cwd(), "public/proposal");
+  const files = fs.readdirSync(directoryPath);
+
+  const images: GalleryImage[] = files
+    .filter((file: string) => file.match(/\.(jpg|jpeg|png|webp)$/i))
+    .map((file: string) => ({ src: `/proposal/${file}` }));
+
+  return {
+    props: {
+      images,
+    },
+  };
+}
+
+export default function ProposalGalleryPage({ images }: { images: GalleryImage[] }) {
   const [visibleImages, setVisibleImages] = useState<GalleryImage[]>(
     images.slice(0, batchSize)
   );
@@ -60,7 +73,7 @@ export default function ProposalGalleryPage() {
 
       setIsLoading(false);
     }, 1000);
-  }, [visibleImages.length]);
+  }, [visibleImages.length, images]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -100,7 +113,7 @@ export default function ProposalGalleryPage() {
               className="relative col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2 cursor-pointer overflow-hidden rounded-lg shadow-md group aspect-video"
             >
               <Image
-                src="/proposal/RonnelJuna-141.JPG" // Replace with actual thumbnail path
+                src="/proposal/RonnelJuna-141.JPG"
                 alt="Play Proposal Video"
                 fill
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -148,7 +161,6 @@ export default function ProposalGalleryPage() {
             </p>
           )}
 
-          {/* Lightbox Modal */}
           {currentIndex !== null && (
             <div className="fixed inset-0 bg-black bg-black/80 flex items-center justify-center z-50 px-4">
               <button
@@ -188,15 +200,12 @@ export default function ProposalGalleryPage() {
 
           {showVideoModal && (
             <div className="fixed inset-0 z-50 bg-black bg-black/80 flex items-center justify-center px-4">
-              {/* Close Button */}
               <button
                 className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
                 onClick={() => setShowVideoModal(false)}
               >
                 <FaTimes />
               </button>
-
-              {/* Responsive Video Container */}
               <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
                 <iframe
                   className="w-full h-full"
