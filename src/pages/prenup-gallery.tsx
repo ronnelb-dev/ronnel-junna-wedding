@@ -128,7 +128,7 @@ export default function PrenupGalleryPage() {
 
           {/* Lightbox Modal */}
           {currentIndex !== null && (
-            <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-4">
+            <div className="fixed inset-0 bg-black bg-black/80 flex items-center justify-center z-50 px-4">
               <button
                 className="absolute top-4 right-6 text-white text-3xl z-50 cursor-pointer"
                 onClick={closeModal}
@@ -165,7 +165,7 @@ export default function PrenupGalleryPage() {
           )}
 
           {showVideoModal && (
-            <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center px-4">
+            <div className="fixed inset-0 z-50 bg-black bg-black/80 flex items-center justify-center px-4">
               {/* Close Button */}
               <button
                 className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
