@@ -63,7 +63,7 @@ export default function OurStoryPage() {
         >
           {[{
             name: "Ronnel Barashari",
-            img: "/images/slider1.jpg",
+            img: "/images/slider1.JPG",
             text: "Someone once told me that \"when you meet the right person, you'll know.\" Well, I just knew. Right away, we connected in a way that left me feeling complete.",
           }, {
             name: "Junna Kudo",

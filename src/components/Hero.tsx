@@ -9,14 +9,14 @@ import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 
 const images: string[] = [
-  "/images/slider1.jpg",
+  "/images/slider1.JPG",
   "/images/slider2.jpg",
   "/images/slider3.jpg",
   "/images/slider4.jpg",
   "/images/slider5.jpg",
   "/images/slider6.jpg",
   "/images/slider7.jpg",
-  "/images/slider8.jpg",
+  "/images/slider8.JPG",
 ];
 
 import Divider from "@/components/Divider";
