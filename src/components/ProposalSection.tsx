@@ -12,7 +12,7 @@ const ProposalSection = () => {
             He asked her & she said yes!
           </h2>
           <p className="text-black text-sm sm:text-lg mb-6 max-w-1xl mx-auto">
-            March 14, 2023. The day I proposed to her was made even more special
+            We we're in the Long distance relationship for 4 years and meeting together for the first time and I also took this as a chance to propose to her. March 14, 2023. The day I proposed to her was made even more special
             by the presence of our family and friends who supported and guided
             us throughout our journey. They have been a big part of our lives.
           </p>

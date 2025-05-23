@@ -33,7 +33,7 @@ export function Component() {
         <NavbarLink href="/our-story" className="text-base sm:text-lg text-black">
           OUR STORY
         </NavbarLink>
-        <NavbarLink href="/wedding-details" className="text-base sm:text-lg text-black">
+        <NavbarLink href="#" className="text-base sm:text-lg text-black">
           WEDDING DETAILS
         </NavbarLink>
 
