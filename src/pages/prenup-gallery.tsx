@@ -34,7 +34,7 @@ export default function PrenupGalleryPage({ allImages }: Props) {
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   const showImage = (index: number) => setCurrentIndex(index);
   const closeModal = () => setCurrentIndex(null);
@@ -49,32 +49,33 @@ export default function PrenupGalleryPage({ allImages }: Props) {
 
   const loadMoreImages = useCallback(() => {
     setIsLoading(true);
+
     setTimeout(() => {
       const nextImages = allImages.slice(
         visibleImages.length,
         visibleImages.length + batchSize
       );
+
       if (nextImages.length === 0) {
         setHasMore(false);
       } else {
         setVisibleImages((prev) => [...prev, ...nextImages]);
       }
+
       setIsLoading(false);
     }, 1000);
   }, [visibleImages.length, allImages]);
-
-  const handleImageLoad = (src: string) => {
-    setLoadedImages((prev) => ({ ...prev, [src]: true }));
-  };
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.innerHeight + window.scrollY;
       const threshold = document.body.offsetHeight - 300;
+
       if (scrollY >= threshold && hasMore && !isLoading) {
         loadMoreImages();
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasMore, isLoading, loadMoreImages]);
@@ -97,33 +98,24 @@ export default function PrenupGalleryPage({ allImages }: Props) {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {visibleImages.map((img, idx) => {
-              const loaded = loadedImages[img.src] || false;
-              return (
-                <div
-                  key={idx}
-                  className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
-                  onClick={() => showImage(idx)}
-                >
-                  <div className="relative w-full h-60">
-                    {!loaded && (
-                      <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg z-0" />
-                    )}
-                    <Image
-                      src={img.src}
-                      alt="Prenup Photo"
-                      fill
-                      className={`object-cover rounded-lg transition-opacity duration-500 ${
-                        loaded ? "opacity-100" : "opacity-0"
-                      }`}
-                      sizes="(max-width: 768px) 100vw, 25vw"
-                      priority={idx < 8}
-                      onLoadingComplete={() => handleImageLoad(img.src)}
-                    />
-                  </div>
+            {visibleImages.map((img, idx) => (
+              <div
+                key={idx}
+                className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
+                onClick={() => showImage(idx)}
+              >
+                <div className="relative w-full h-60">
+                  <Image
+                    src={img.src}
+                    alt="Prenup Photo"
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    priority={idx < 8}
+                  />
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
 
           {isLoading && (
@@ -139,7 +131,7 @@ export default function PrenupGalleryPage({ allImages }: Props) {
           )}
 
           {currentIndex !== null && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+            <div className="fixed inset-0 bg-black bg-black/80 flex items-center justify-center z-50 px-4">
               <button
                 className="absolute top-4 right-6 text-white text-3xl z-50 cursor-pointer"
                 onClick={closeModal}
@@ -156,22 +148,12 @@ export default function PrenupGalleryPage({ allImages }: Props) {
 
               <div className="flex flex-col items-center">
                 <div className="relative w-[90vw] h-[80vh]">
-                  {!loadedImages[allImages[currentIndex].src] && (
-                    <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-md z-0" />
-                  )}
                   <Image
                     src={allImages[currentIndex].src}
                     alt="Prenup Photo"
                     fill
-                    className={`object-contain rounded-md shadow-lg transition-opacity duration-500 ${
-                      loadedImages[allImages[currentIndex].src]
-                        ? "opacity-100"
-                        : "opacity-0"
-                    }`}
+                    className="object-contain rounded-md shadow-lg"
                     sizes="(max-width: 768px) 100vw, 80vw"
-                    onLoadingComplete={() =>
-                      handleImageLoad(allImages[currentIndex].src)
-                    }
                   />
                 </div>
               </div>
@@ -182,6 +164,28 @@ export default function PrenupGalleryPage({ allImages }: Props) {
               >
                 <FaChevronRight />
               </button>
+            </div>
+          )}
+
+          {showVideoModal && (
+            <div className="fixed inset-0 z-50 bg-black bg-black/80 flex items-center justify-center px-4">
+              <button
+                className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
+                onClick={() => setShowVideoModal(false)}
+              >
+                <FaTimes />
+              </button>
+
+              <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/c-LAhOIwb-E?autoplay=1"
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  frameBorder="0"
+                ></iframe>
+              </div>
             </div>
           )}
         </div>
