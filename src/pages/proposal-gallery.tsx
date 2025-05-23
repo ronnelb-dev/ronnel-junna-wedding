@@ -20,7 +20,7 @@ interface GalleryImage {
   src: string;
 }
 
-const batchSize = 24;
+const batchSize = 26;
 
 export async function getStaticProps() {
   const directoryPath = path.join(process.cwd(), "public/proposal");
@@ -37,7 +37,11 @@ export async function getStaticProps() {
   };
 }
 
-export default function ProposalGalleryPage({ images }: { images: GalleryImage[] }) {
+export default function ProposalGalleryPage({
+  images,
+}: {
+  images: GalleryImage[];
+}) {
   const [visibleImages, setVisibleImages] = useState<GalleryImage[]>(
     images.slice(0, batchSize)
   );
@@ -45,6 +49,7 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [modalImageLoading, setModalImageLoading] = useState(true);
 
   const showImage = (index: number) => setCurrentIndex(index);
   const closeModal = () => setCurrentIndex(null);
@@ -132,7 +137,10 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
               <div
                 key={idx}
                 className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
-                onClick={() => showImage(idx)}
+                onClick={() => {
+                  setModalImageLoading(true);
+                  showImage(idx);
+                }}
               >
                 <div className="relative w-full h-60">
                   <Image
@@ -161,7 +169,7 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
           )}
 
           {currentIndex !== null && (
-            <div className="fixed inset-0 bg-black bg-black/80 flex items-center justify-center z-50 px-4">
+            <div className="fixed inset-0  bg-black/80 flex items-center justify-center z-50 px-4">
               <button
                 className="absolute top-4 right-6 text-white text-3xl z-50 cursor-pointer"
                 onClick={closeModal}
@@ -171,26 +179,42 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
 
               <button
                 className="absolute left-4 text-white text-4xl z-50 cursor-pointer"
-                onClick={showPrev}
+                onClick={() => {
+                  setModalImageLoading(true);
+                  showPrev();
+                }}
               >
                 <FaChevronLeft />
               </button>
 
-              <div className="flex flex-col items-center">
-                <div className="relative w-[90vw] h-[80vh]">
-                  <Image
-                    src={images[currentIndex].src}
-                    alt="Prenup Photo"
-                    fill
-                    className="object-contain rounded-md shadow-lg"
-                    sizes="(max-width: 768px) 100vw, 80vw"
-                  />
-                </div>
+              <div className="flex flex-col items-center relative w-[90vw] h-[80vh]">
+                {/* Spinner overlay while loading */}
+                {modalImageLoading && (
+                  <div className="absolute inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center z-20">
+                    <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 animate-spin border-t-blue-500"></div>
+                  </div>
+                )}
+
+                <Image
+                  key={images[currentIndex].src} // force re-render when src changes
+                  src={images[currentIndex].src}
+                  alt="Prenup Photo"
+                  fill
+                  className={`object-contain rounded-md shadow-lg transition-opacity duration-700 ${
+                    modalImageLoading ? "opacity-0" : "opacity-100"
+                  }`}
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  onLoadingComplete={() => setModalImageLoading(false)}
+                  onLoadStart={() => setModalImageLoading(true)}
+                />
               </div>
 
               <button
                 className="absolute right-4 text-white text-4xl z-50 cursor-pointer"
-                onClick={showNext}
+                onClick={() => {
+                  setModalImageLoading(true);
+                  showNext();
+                }}
               >
                 <FaChevronRight />
               </button>
@@ -198,7 +222,7 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
           )}
 
           {showVideoModal && (
-            <div className="fixed inset-0 z-50 bg-black bg-black/80 flex items-center justify-center px-4">
+            <div className="fixed inset-0 z-50  bg-black/80 flex items-center justify-center px-4">
               <button
                 className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
                 onClick={() => setShowVideoModal(false)}

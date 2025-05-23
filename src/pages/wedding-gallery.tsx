@@ -32,8 +32,8 @@ export default function WeddingGalleryPage({ allImages }: Props) {
   const [currentImage, setCurrentImage] = useState<GalleryImage | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [modalImageLoading, setModalImageLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
     {}
   );
@@ -267,7 +267,10 @@ export default function WeddingGalleryPage({ allImages }: Props) {
               <div
                 key={idx}
                 className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
-                onClick={() => showImage(img)}
+                onClick={() => {
+                  setModalImageLoading(true);
+                  showImage(img);
+                }}
               >
                 <div className="relative w-full h-60">
                   <Image
@@ -296,63 +299,58 @@ export default function WeddingGalleryPage({ allImages }: Props) {
           )}
 
           {currentImage && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
-              <button
-                className="absolute top-4 right-6 text-white text-3xl z-50 cursor-pointer"
-                onClick={closeModal}
-              >
-                <FaTimes />
-              </button>
-
-              <button
-                className="absolute left-4 text-white text-4xl z-50 cursor-pointer"
-                onClick={showPrev}
-              >
-                <FaChevronLeft />
-              </button>
-
-              <div className="flex flex-col items-center">
-                <div className="relative w-[90vw] h-[80vh]">
-                  <Image
-                    src={currentImage.src}
-                    alt="Wedding Photo"
-                    fill
-                    className="object-contain rounded-md shadow-lg"
-                    sizes="(max-width: 768px) 100vw, 80vw"
-                  />
-                </div>
-              </div>
-
-              <button
-                className="absolute right-4 text-white text-4xl z-50 cursor-pointer"
-                onClick={showNext}
-              >
-                <FaChevronRight />
-              </button>
-            </div>
+            <div className="fixed inset-0  bg-black/80 flex items-center justify-center z-50 px-4">
+                          <button
+                            className="absolute top-4 right-6 text-white text-3xl z-50 cursor-pointer"
+                            onClick={closeModal}
+                          >
+                            <FaTimes />
+                          </button>
+            
+                          <button
+                            className="absolute left-4 text-white text-4xl z-50 cursor-pointer"
+                            onClick={() => {
+                              setModalImageLoading(true);
+                              showPrev();
+                            }}
+                          >
+                            <FaChevronLeft />
+                          </button>
+            
+                          <div className="flex flex-col items-center relative w-[90vw] h-[80vh]">
+                            {/* Spinner overlay while loading */}
+                            {modalImageLoading && (
+                              <div className="absolute inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center z-20">
+                                <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 animate-spin border-t-blue-500"></div>
+                              </div>
+                            )}
+            
+                            <Image
+                              key={currentImage.src}
+                              src={currentImage.src}
+                              alt="Prenup Photo"
+                              fill
+                              className={`object-contain rounded-md shadow-lg transition-opacity duration-700 ${
+                                modalImageLoading ? "opacity-0" : "opacity-100"
+                              }`}
+                              sizes="(max-width: 768px) 100vw, 80vw"
+                              onLoadingComplete={() => setModalImageLoading(false)}
+                              onLoadStart={() => setModalImageLoading(true)}
+                            />
+                          </div>
+            
+                          <button
+                            className="absolute right-4 text-white text-4xl z-50 cursor-pointer"
+                            onClick={() => {
+                              setModalImageLoading(true);
+                              showNext();
+                            }}
+                          >
+                            <FaChevronRight />
+                          </button>
+                        </div>
           )}
 
-          {showVideoModal && (
-            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center px-4">
-              <button
-                className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
-                onClick={() => setShowVideoModal(false)}
-              >
-                <FaTimes />
-              </button>
-
-              <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
-                <iframe
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/c-LAhOIwb-E?autoplay=1"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  frameBorder="0"
-                ></iframe>
-              </div>
-            </div>
-          )}
         </div>
       </body>
       <Footer />

@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { GetStaticProps } from "next";
 import "@/styles/globals.css";
 import Head from "next/head";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
@@ -21,37 +20,50 @@ interface GalleryImage {
   src: string;
 }
 
-interface Props {
-  allImages: GalleryImage[];
-}
-
 const batchSize = 24;
 
-export default function PrenupGalleryPage({ allImages }: Props) {
+export async function getStaticProps() {
+  const directoryPath = path.join(process.cwd(), "public/prenup");
+  const files = fs.readdirSync(directoryPath);
+
+  const images: GalleryImage[] = files
+    .filter((file: string) => file.match(/\.(jpg|jpeg|png|webp)$/i))
+    .map((file: string) => ({ src: `/prenup/${file}` }));
+
+  return {
+    props: {
+      images,
+    },
+  };
+}
+
+export default function PrenupGalleryPage({
+  images,
+}: {
+  images: GalleryImage[];
+}) {
   const [visibleImages, setVisibleImages] = useState<GalleryImage[]>(
-    allImages.slice(0, batchSize)
+    images.slice(0, batchSize)
   );
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [modalImageLoading, setModalImageLoading] = useState(true);
 
   const showImage = (index: number) => setCurrentIndex(index);
   const closeModal = () => setCurrentIndex(null);
   const showNext = () =>
-    setCurrentIndex((prev) =>
-      prev !== null ? (prev + 1) % allImages.length : 0
-    );
+    setCurrentIndex((prev) => (prev !== null ? (prev + 1) % images.length : 0));
   const showPrev = () =>
     setCurrentIndex((prev) =>
-      prev !== null ? (prev - 1 + allImages.length) % allImages.length : 0
+      prev !== null ? (prev - 1 + images.length) % images.length : 0
     );
 
   const loadMoreImages = useCallback(() => {
     setIsLoading(true);
 
     setTimeout(() => {
-      const nextImages = allImages.slice(
+      const nextImages = images.slice(
         visibleImages.length,
         visibleImages.length + batchSize
       );
@@ -64,7 +76,7 @@ export default function PrenupGalleryPage({ allImages }: Props) {
 
       setIsLoading(false);
     }, 1000);
-  }, [visibleImages.length, allImages]);
+  }, [visibleImages.length, images]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,7 +96,7 @@ export default function PrenupGalleryPage({ allImages }: Props) {
     <>
       <Head>
         <title>Ronnel & Junna - Prenup Gallery</title>
-        <meta name="description" content="Ronnel and Junna Prenup" />
+        <meta name="description" content="Prenup" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -102,7 +114,10 @@ export default function PrenupGalleryPage({ allImages }: Props) {
               <div
                 key={idx}
                 className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
-                onClick={() => showImage(idx)}
+                onClick={() => {
+                  setModalImageLoading(true);
+                  showImage(idx);
+                }}
               >
                 <div className="relative w-full h-60">
                   <Image
@@ -131,7 +146,7 @@ export default function PrenupGalleryPage({ allImages }: Props) {
           )}
 
           {currentIndex !== null && (
-            <div className="fixed inset-0 bg-black bg-black/80 flex items-center justify-center z-50 px-4">
+            <div className="fixed inset-0  bg-black/80 flex items-center justify-center z-50 px-4">
               <button
                 className="absolute top-4 right-6 text-white text-3xl z-50 cursor-pointer"
                 onClick={closeModal}
@@ -141,51 +156,45 @@ export default function PrenupGalleryPage({ allImages }: Props) {
 
               <button
                 className="absolute left-4 text-white text-4xl z-50 cursor-pointer"
-                onClick={showPrev}
+                onClick={() => {
+                  setModalImageLoading(true);
+                  showPrev();
+                }}
               >
                 <FaChevronLeft />
               </button>
 
-              <div className="flex flex-col items-center">
-                <div className="relative w-[90vw] h-[80vh]">
-                  <Image
-                    src={allImages[currentIndex].src}
-                    alt="Prenup Photo"
-                    fill
-                    className="object-contain rounded-md shadow-lg"
-                    sizes="(max-width: 768px) 100vw, 80vw"
-                  />
-                </div>
+              <div className="flex flex-col items-center relative w-[90vw] h-[80vh]">
+                {/* Spinner overlay while loading */}
+                {modalImageLoading && (
+                  <div className="absolute inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center z-20">
+                    <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 animate-spin border-t-blue-500"></div>
+                  </div>
+                )}
+
+                <Image
+                  key={images[currentIndex].src} // force re-render when src changes
+                  src={images[currentIndex].src}
+                  alt="Prenup Photo"
+                  fill
+                  className={`object-contain rounded-md shadow-lg transition-opacity duration-700 ${
+                    modalImageLoading ? "opacity-0" : "opacity-100"
+                  }`}
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  onLoadingComplete={() => setModalImageLoading(false)}
+                  onLoadStart={() => setModalImageLoading(true)}
+                />
               </div>
 
               <button
                 className="absolute right-4 text-white text-4xl z-50 cursor-pointer"
-                onClick={showNext}
+                onClick={() => {
+                  setModalImageLoading(true);
+                  showNext();
+                }}
               >
                 <FaChevronRight />
               </button>
-            </div>
-          )}
-
-          {showVideoModal && (
-            <div className="fixed inset-0 z-50 bg-black bg-black/80 flex items-center justify-center px-4">
-              <button
-                className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
-                onClick={() => setShowVideoModal(false)}
-              >
-                <FaTimes />
-              </button>
-
-              <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
-                <iframe
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/c-LAhOIwb-E?autoplay=1"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  frameBorder="0"
-                ></iframe>
-              </div>
             </div>
           )}
         </div>
@@ -194,15 +203,3 @@ export default function PrenupGalleryPage({ allImages }: Props) {
     </>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const dir = path.join(process.cwd(), "public", "prenup");
-  const files = fs.readdirSync(dir);
-  const allImages = files
-    .filter((file: string) => /\.(jpe?g|png|webp)$/i.test(file))
-    .map((file: string) => ({ src: `/prenup/${file}` }));
-
-  return {
-    props: { allImages },
-  };
-};
