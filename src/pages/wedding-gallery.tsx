@@ -32,15 +32,23 @@ export default function WeddingGalleryPage({ allImages }: Props) {
   const [currentImage, setCurrentImage] = useState<GalleryImage | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
     {}
   );
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [modalImageLoaded, setModalImageLoaded] = useState(false);
 
-  const showImage = (img: GalleryImage) => setCurrentImage(img);
+  const showImage = (img: GalleryImage) => {
+    setModalImageLoaded(false);
+    setCurrentImage(img);
+  };
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+
+  const handleImageLoad = (src: string) => {
+    setLoadedImages((prev) => ({ ...prev, [src]: true }));
+  };
   const closeModal = () => setCurrentImage(null);
   const showNext = () => {
     const currentIndex = visibleImages.findIndex(
@@ -263,24 +271,34 @@ export default function WeddingGalleryPage({ allImages }: Props) {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {visibleImages.map((img, idx) => (
-              <div
-                key={idx}
-                className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
-                onClick={() => showImage(img)}
-              >
-                <div className="relative w-full h-60">
-                  <Image
-                    src={img.src}
-                    alt="Wedding Photo"
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    priority={idx < 8}
-                  />
+            {visibleImages.map((img, idx) => {
+              const loaded = loadedImages[img.src] || false;
+
+              return (
+                <div
+                  key={idx}
+                  className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
+                  onClick={() => showImage(img)}
+                >
+                  <div className="relative w-full h-60">
+                    {!loaded && (
+                      <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg z-0" />
+                    )}
+                    <Image
+                      src={img.src}
+                      alt="Wedding Photo"
+                      fill
+                      className={`object-cover rounded-lg transition-opacity duration-500 ${
+                        loaded ? "opacity-100" : "opacity-0"
+                      }`}
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      priority={idx < 8}
+                      onLoadingComplete={() => handleImageLoad(img.src)}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {isLoading && (
@@ -313,12 +331,20 @@ export default function WeddingGalleryPage({ allImages }: Props) {
 
               <div className="flex flex-col items-center">
                 <div className="relative w-[90vw] h-[80vh]">
+                  <div
+                    className={`absolute inset-0 bg-gray-300 rounded-md z-0 transition-opacity duration-700 ${
+                      modalImageLoaded ? "opacity-0" : "opacity-100"
+                    }`}
+                  />
                   <Image
                     src={currentImage.src}
                     alt="Wedding Photo"
                     fill
-                    className="object-contain rounded-md shadow-lg"
+                    className={`object-contain rounded-md shadow-lg transition-opacity duration-500 ${
+                      modalImageLoaded ? "opacity-100" : "opacity-0"
+                    }`}
                     sizes="(max-width: 768px) 100vw, 80vw"
+                    onLoadingComplete={() => setModalImageLoaded(true)}
                   />
                 </div>
               </div>
@@ -329,28 +355,6 @@ export default function WeddingGalleryPage({ allImages }: Props) {
               >
                 <FaChevronRight />
               </button>
-            </div>
-          )}
-
-          {showVideoModal && (
-            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center px-4">
-              <button
-                className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
-                onClick={() => setShowVideoModal(false)}
-              >
-                <FaTimes />
-              </button>
-
-              <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
-                <iframe
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/c-LAhOIwb-E?autoplay=1"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  frameBorder="0"
-                ></iframe>
-              </div>
             </div>
           )}
         </div>

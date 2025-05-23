@@ -20,7 +20,7 @@ interface GalleryImage {
   src: string;
 }
 
-const batchSize = 24;
+const batchSize = 26;
 
 export async function getStaticProps() {
   const directoryPath = path.join(process.cwd(), "public/proposal");
@@ -37,7 +37,11 @@ export async function getStaticProps() {
   };
 }
 
-export default function ProposalGalleryPage({ images }: { images: GalleryImage[] }) {
+export default function ProposalGalleryPage({
+  images,
+}: {
+  images: GalleryImage[];
+}) {
   const [visibleImages, setVisibleImages] = useState<GalleryImage[]>(
     images.slice(0, batchSize)
   );
@@ -45,6 +49,9 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [loaded, setLoaded] = useState<boolean[]>(
+    Array(images.length).fill(false)
+  );
 
   const showImage = (index: number) => setCurrentIndex(index);
   const closeModal = () => setCurrentIndex(null);
@@ -54,6 +61,14 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
     setCurrentIndex((prev) =>
       prev !== null ? (prev - 1 + images.length) % images.length : 0
     );
+
+  const handleImageLoad = (index: number) => {
+    setLoaded((prev) => {
+      const updated = [...prev];
+      updated[index] = true;
+      return updated;
+    });
+  };
 
   const loadMoreImages = useCallback(() => {
     setIsLoading(true);
@@ -106,16 +121,21 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {/* Embedded YouTube Video */}
             <div
               onClick={() => setShowVideoModal(true)}
               className="relative col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2 cursor-pointer overflow-hidden rounded-lg shadow-md group aspect-video"
             >
+              {!loaded[0] && (
+                <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg" />
+              )}
               <Image
                 src="/proposal/RonnelJuna-141.JPG"
                 alt="Play Proposal Video"
                 fill
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
+                  loaded[0] ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => handleImageLoad(0)}
               />
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <svg
@@ -135,13 +155,19 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
                 onClick={() => showImage(idx)}
               >
                 <div className="relative w-full h-60">
+                  {!loaded[idx] && (
+                    <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg" />
+                  )}
                   <Image
                     src={img.src}
                     alt="Proposal Photo"
                     fill
-                    className="object-cover rounded-lg"
+                    className={`object-cover rounded-lg transition-opacity duration-500 ${
+                      loaded[idx] ? "opacity-100" : "opacity-0"
+                    }`}
                     sizes="(max-width: 768px) 100vw, 25vw"
                     priority={idx < 8}
+                    onLoad={() => handleImageLoad(idx)}
                   />
                 </div>
               </div>
@@ -161,7 +187,7 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
           )}
 
           {currentIndex !== null && (
-            <div className="fixed inset-0 bg-black bg-black/80 flex items-center justify-center z-50 px-4">
+            <div className="fixed inset-0  bg-black/80 flex items-center justify-center z-50 px-4">
               <button
                 className="absolute top-4 right-6 text-white text-3xl z-50 cursor-pointer"
                 onClick={closeModal}
@@ -178,12 +204,18 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
 
               <div className="flex flex-col items-center">
                 <div className="relative w-[90vw] h-[80vh]">
+                  {!loaded[currentIndex] && (
+                    <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-md" />
+                  )}
                   <Image
                     src={images[currentIndex].src}
                     alt="Prenup Photo"
                     fill
-                    className="object-contain rounded-md shadow-lg"
+                    className={`object-contain rounded-md shadow-lg transition-opacity duration-500 ${
+                      loaded[currentIndex] ? "opacity-100" : "opacity-0"
+                    }`}
                     sizes="(max-width: 768px) 100vw, 80vw"
+                    onLoad={() => handleImageLoad(currentIndex)}
                   />
                 </div>
               </div>
@@ -198,7 +230,7 @@ export default function ProposalGalleryPage({ images }: { images: GalleryImage[]
           )}
 
           {showVideoModal && (
-            <div className="fixed inset-0 z-50 bg-black bg-black/80 flex items-center justify-center px-4">
+            <div className="fixed inset-0 z-50  bg-black/80 flex items-center justify-center px-4">
               <button
                 className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
                 onClick={() => setShowVideoModal(false)}
