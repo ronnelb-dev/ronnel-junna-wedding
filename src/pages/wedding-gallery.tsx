@@ -328,13 +328,15 @@ export default function WeddingGalleryPage({ allImages }: Props) {
   );
 }
 
+type ServerImage = { url: string };
+
 export const getServerSideProps: GetServerSideProps = async () => {
   const res = await fetch(
     "https://webcoastserver.com/phc/uploads/list_uploads.php"
   );
   const data = await res.json();
 
-  const allImages: GalleryImage[] = data.images.map((img: any) => ({
+  const allImages: GalleryImage[] = data.images.map((img: ServerImage) => ({
     src: img.url,
   }));
 
