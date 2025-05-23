@@ -33,6 +33,7 @@ export default function WeddingGalleryPage({ allImages }: Props) {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
     {}
   );
@@ -98,6 +99,7 @@ export default function WeddingGalleryPage({ allImages }: Props) {
   }, [hasMore, isLoading, loadMoreImages, uploadErrors]);
 
   const handleUpload = async (files: FileList) => {
+    setIsUploading(true); // Start uploading
     const uploads: Promise<void>[] = [];
     const errors: string[] = [];
 
@@ -141,6 +143,7 @@ export default function WeddingGalleryPage({ allImages }: Props) {
 
     await Promise.all(uploads);
     setUploadErrors(errors);
+    setIsUploading(false); // Finish uploading
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,7 +191,7 @@ export default function WeddingGalleryPage({ allImages }: Props) {
             <p className="text-gray-600 text-lg mb-2">
               Drop images here to upload
             </p>
-            <p className="text-gray-600 text-lg mb-2">OR</p>
+            <p className="text-gray-600 text-lg mb-2">or</p>
             <button
               onClick={() => inputRef.current?.click()}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -205,13 +208,42 @@ export default function WeddingGalleryPage({ allImages }: Props) {
             />
           </div>
 
-          <div className="max-w-4xl mx-auto mb-10 space-y-2">
+          {isUploading && (
+            <div className="flex items-center justify-center gap-2 text-blue-600 font-medium mb-4">
+              <svg
+                className="animate-spin h-5 w-5 text-blue-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              Uploading photos...
+            </div>
+          )}
+
+          <div className="max-w-4xl mx-auto mb-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Object.entries(uploadProgress).map(([name, percent]) => (
               <div key={name}>
-                <p className="text-sm text-gray-700">{name}</p>
-                <div className="w-full bg-gray-200 h-2 rounded">
+                <div className="flex justify-between text-sm text-gray-700">
+                  <p className="truncate">{name}</p>
+                  <p>{percent}%</p>
+                </div>
+                <div className="w-full bg-gray-200 h-2 rounded overflow-hidden">
                   <div
-                    className="bg-blue-500 h-2 rounded"
+                    className="bg-blue-500 h-2 rounded transition-all duration-500 ease-in-out"
                     style={{ width: `${percent}%` }}
                   ></div>
                 </div>
