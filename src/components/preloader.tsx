@@ -7,7 +7,7 @@ const Preloader = () => {
     // Simulate a loading process (adjust timing as needed)
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 4000); // Change duration as needed
+    }, 2500); // Change duration as needed
 
     return () => clearTimeout(timer);
   }, []);
