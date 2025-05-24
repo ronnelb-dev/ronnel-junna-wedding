@@ -41,14 +41,14 @@ const SaveTheDateSection: FC = () => {
                 Request the honor of your presence on their wedding day
               </p>
 
-              <Divider position="top" className="w-[100%] max-w-sm mx-auto" />
+              <Divider position="top" className="w-[60%] max-w-sm mx-auto" />
 
               <div className="text-center">
                 <p className="text-xl sm:text-2xl font-bold">August 8, 2025</p>
                 <p className="text-sm sm:text-base">at 04:00 PM</p>
               </div>
 
-              <Divider position="bottom" className="w-[100%] max-w-sm mx-auto" />
+              <Divider position="bottom" className="w-[60%] max-w-sm mx-auto" />
 
               <div className="text-sm sm:text-base text-center">
                 <p>at Sky Garden Cafe</p>
