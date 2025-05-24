@@ -16,21 +16,22 @@ const playfair = Playfair_Display({
   weight: ["400", "700"],
 });
 
-interface GalleryImage {
+interface GalleryMedia {
   src: string;
+  type: "image" | "video";
 }
 
 interface Props {
-  allImages: GalleryImage[];
+  allImages: GalleryMedia[];
 }
 
 const batchSize = 24;
 
 export default function WeddingGalleryPage({ allImages }: Props) {
-  const [visibleImages, setVisibleImages] = useState<GalleryImage[]>(
+  const [visibleImages, setVisibleImages] = useState<GalleryMedia[]>(
     allImages.slice(0, batchSize)
   );
-  const [currentImage, setCurrentImage] = useState<GalleryImage | null>(null);
+  const [currentImage, setCurrentImage] = useState<GalleryMedia | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -43,8 +44,7 @@ export default function WeddingGalleryPage({ allImages }: Props) {
   );
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const showImage = (img: GalleryImage) => setCurrentImage(img);
+  const showImage = (img: GalleryMedia) => setCurrentImage(img);
   const closeModal = () => setCurrentImage(null);
   const showNext = () => {
     const currentIndex = visibleImages.findIndex(
@@ -129,9 +129,14 @@ export default function WeddingGalleryPage({ allImages }: Props) {
                 if (progress >= 100) clearInterval(interval);
               }, 100);
 
+              const isVideo = (file: File) => file.type.startsWith("video/");
               const previewUrl = URL.createObjectURL(file);
+              const mediaType = isVideo(file) ? "video" : "image";
 
-              setVisibleImages((prev) => [{ src: previewUrl }, ...prev]);
+              setVisibleImages((prev) => [
+                { src: previewUrl, type: mediaType },
+                ...prev,
+              ]);
             } else {
               errors.push(
                 `${file.name}: ${result.errors?.[0]?.error || "Upload failed."}`
@@ -193,20 +198,20 @@ export default function WeddingGalleryPage({ allImages }: Props) {
             onDrop={handleDrop}
           >
             <p className="text-gray-600 text-lg mb-2">
-              Drop images here to upload
+              Drop Photos/Videos here to upload
             </p>
             <p className="text-gray-600 text-lg mb-2">or</p>
             <button
               onClick={() => inputRef.current?.click()}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
-              Select Photos
+              Select Photos/Videos
             </button>
             <input
               ref={inputRef}
               type="file"
               multiple
-              accept="image/*"
+              accept="image/*,video/*"
               onChange={handleFileChange}
               hidden
             />
@@ -234,7 +239,7 @@ export default function WeddingGalleryPage({ allImages }: Props) {
                   d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                 ></path>
               </svg>
-              Uploading photos...
+              Uploading, please wait...
             </div>
           )}
 
@@ -267,24 +272,46 @@ export default function WeddingGalleryPage({ allImages }: Props) {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {visibleImages.map((img, idx) => (
+            {visibleImages.map((media, idx) => (
               <div
                 key={idx}
                 className="overflow-hidden rounded-lg shadow-md cursor-pointer group transform transition-transform duration-300 ease-in-out hover:scale-105 opacity-0 animate-fade-in"
                 onClick={() => {
                   setModalImageLoading(true);
-                  showImage(img);
+                  showImage(media);
                 }}
               >
                 <div className="relative w-full h-60">
-                  <Image
-                    src={img.src}
-                    alt="Wedding Photo"
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    priority={idx < 8}
-                  />
+                  {media.type === "image" ? (
+                    <Image
+                      src={media.src}
+                      alt="Wedding Photo"
+                      fill
+                      className="object-cover rounded-lg"
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      priority={idx < 8}
+                    />
+                  ) : (
+                    <div className="relative w-full h-full rounded-lg overflow-hidden">
+                      <video
+                        src={media.src}
+                        className="object-cover w-full h-full"
+                        preload="metadata"
+                        muted
+                        playsInline
+                      />
+                      {/* Play Button Overlay */}
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <svg
+                          className="w-12 h-12 text-white opacity-80"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -373,17 +400,29 @@ export default function WeddingGalleryPage({ allImages }: Props) {
                       }
                     }}
                   >
-                    <Image
-                      src={currentImage.src}
-                      alt="Prenup Photo"
-                      fill
-                      className={`object-contain rounded-md shadow-lg transition-opacity duration-700 ${
-                        modalImageLoading ? "opacity-0" : "opacity-100"
-                      }`}
-                      sizes="(max-width: 768px) 100vw, 80vw"
-                      onLoadStart={() => setModalImageLoading(true)}
-                      onLoadingComplete={() => setModalImageLoading(false)}
-                    />
+                    {currentImage.type === "image" ? (
+                      <Image
+                        src={currentImage.src}
+                        alt="Prenup Photo"
+                        fill
+                        className={`object-contain rounded-md shadow-lg transition-opacity duration-700 ${
+                          modalImageLoading ? "opacity-0" : "opacity-100"
+                        }`}
+                        sizes="(max-width: 768px) 100vw, 80vw"
+                        onLoadStart={() => setModalImageLoading(true)}
+                        onLoadingComplete={() => setModalImageLoading(false)}
+                      />
+                    ) : (
+                      <video
+                        src={currentImage.src}
+                        className={`object-contain rounded-md shadow-lg w-full h-full transition-opacity duration-700 ${
+                          modalImageLoading ? "opacity-0" : "opacity-100"
+                        }`}
+                        controls
+                        autoPlay
+                        onCanPlay={() => setModalImageLoading(false)}
+                      />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -412,12 +451,13 @@ type ServerImage = { url: string };
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const res = await fetch(
-    "https://webcoastserver.com/phc/uploads/list_uploads.php"
+    "https://webcoastserver.com/phc/uploads/files_list.php"
   );
   const data = await res.json();
 
-  const allImages: GalleryImage[] = data.images.map((img: ServerImage) => ({
+  const allImages: GalleryMedia[] = data.media.map((img: ServerImage) => ({
     src: img.url,
+    type: img.url.match(/\.(mp4|webm|ogg)$/i) ? "video" : "image",
   }));
 
   return {
