@@ -270,6 +270,27 @@ export default function ProposalGalleryPage({
               </button>
             </div>
           )}
+
+          {showVideoModal && (
+            <div className="fixed inset-0 z-50  bg-black/80 flex items-center justify-center px-4">
+              <button
+                className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
+                onClick={() => setShowVideoModal(false)}
+              >
+                <FaTimes />
+              </button>
+              <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/c-LAhOIwb-E?autoplay=1"
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  frameBorder="0"
+                ></iframe>
+              </div>
+            </div>
+          )}
         </div>
       </body>
       <Footer />
