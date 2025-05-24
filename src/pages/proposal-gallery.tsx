@@ -21,7 +21,7 @@ interface GalleryImage {
   src: string;
 }
 
-const batchSize = 26;
+const batchSize = 24;
 
 export async function getStaticProps() {
   const directoryPath = path.join(process.cwd(), "public/proposal");
@@ -50,6 +50,7 @@ export default function ProposalGalleryPage({
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showPrenupVideoModal, setShowPrenupVideoModal] = useState(false);
   const [modalImageLoading, setModalImageLoading] = useState(true);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">(
     "right"
@@ -121,6 +122,27 @@ export default function ProposalGalleryPage({
             >
               <Image
                 src="/proposal/RonnelJuna-141.JPG"
+                alt="Play Proposal Video"
+                fill
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <svg
+                  className="w-16 h-16 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 15 15"
+                >
+                  <path d="M6.5 5.5v9l7-4.5-7-4.5z" />
+                </svg>
+              </div>
+            </div>
+
+            <div
+              onClick={() => setShowPrenupVideoModal(true)}
+              className="relative col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2 cursor-pointer overflow-hidden rounded-lg shadow-md group aspect-video"
+            >
+              <Image
+                src="/images/proposal_thumbnail.jpg"
                 alt="Play Proposal Video"
                 fill
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -283,6 +305,27 @@ export default function ProposalGalleryPage({
                 <iframe
                   className="w-full h-full"
                   src="https://www.youtube.com/embed/c-LAhOIwb-E?autoplay=1"
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  frameBorder="0"
+                ></iframe>
+              </div>
+            </div>
+          )}
+
+          {showPrenupVideoModal && (
+            <div className="fixed inset-0 z-50  bg-black/80 flex items-center justify-center px-4">
+              <button
+                className="absolute top-4 right-4 text-white text-3xl md:text-4xl z-50 cursor-pointer"
+                onClick={() => setShowPrenupVideoModal(false)}
+              >
+                <FaTimes />
+              </button>
+              <div className="relative w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/h3L-ZnvkGZo?autoplay=1"
                   title="YouTube video player"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
