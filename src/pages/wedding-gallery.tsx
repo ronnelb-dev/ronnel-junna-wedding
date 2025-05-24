@@ -293,12 +293,12 @@ export default function WeddingGalleryPage({ allImages }: Props) {
                     />
                   ) : (
                     <div className="relative w-full h-full rounded-lg overflow-hidden">
-                      <video
-                        src={media.src}
-                        className="object-cover w-full h-full"
-                        preload="metadata"
-                        muted
-                        playsInline
+                      <Image
+                        src="https://webcoastserver.com/phc/uploads/video-thumbnail.jpg"
+                        alt="Wedding Photo"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        className="object-cover rounded-lg"
                       />
                       {/* Play Button Overlay */}
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
